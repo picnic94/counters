@@ -10,20 +10,39 @@ const App = () => {
   const [correct, setCorrect] = useState((initState && initState.correct) || 0)
   const [wrong, setWrong] = useState((initState && initState.wrong) || 0)
   const [saved, setSaved] = useState((initState && initState.saved))
+  const [lastAction, setLastAction] = useState((initState && initState.lastAction))
+
+  const onClickUndo = (evt) => {
+    switch (lastAction) {
+      case "CORRECT":
+        setCorrect(correct - 1);
+        setLastAction(null);
+        break;
+      case "WRONG":
+        setWrong(wrong - 1);
+        setLastAction(null);
+        break;
+      default:
+        break;
+    }
+  }
 
   const onClickCorrect = (evt) => {
-    setCorrect(correct + 1)
+    setCorrect(correct + 1);
+    setLastAction("CORRECT");
     // updateCookie()
   }
 
   const onClickWrong = (evt) => {
-    setWrong(wrong + 1)
+    setWrong(wrong + 1);
+    setLastAction("WRONG");
     // updateCookie()
   }
 
   const onClickClear = (evt) => {
     setCorrect(0);
     setWrong(0);
+    setLastAction(null);
     setSaved(null);
     cookies.set('state', null, { path: '/' })
   }
@@ -52,21 +71,23 @@ const App = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <span>
+        <span style={{width: '-webkit-fill-available'}}>
           <button onClick={onClickClear}>Clear session</button>
           <span>
             {
               saved ? <p className="timestamp">Session saved: {new Date(saved).toLocaleString()}</p> : null}
           </span>
+          <span style={{width: '-webkit-fill-available'}}/>
+          {lastAction ? <button onClick={onClickUndo}>Undo</button> : null}
         </span>
         <div style={{ width: '100%', diplay: 'grid', justifyContent: 'center' }}>
-            <div style={{ fontSize: '2rem', display: 'inline-flex', gap: '1rem'}}>
-              <span>Total answered:</span><span>{correct + wrong}</span>
-            </div>
-            <br/>
-            <div style={{ fontSize: '2.5rem', display: 'inline-flex', gap: '1rem'}}>
-              <span>Next:</span><span>{correct + wrong+1}</span>
-            </div>
+          <div style={{ fontSize: '2rem', display: 'inline-flex', gap: '1rem' }}>
+            <span>Total answered:</span><span>{correct + wrong}</span>
+          </div>
+          <br />
+          <div style={{ fontSize: '2.5rem', display: 'inline-flex', gap: '1rem' }}>
+            <span>Next:</span><span>{correct + wrong + 1}</span>
+          </div>
         </div>
         <div className="App-body">
           <div className='correct-group'>
